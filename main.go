@@ -29,7 +29,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 func main() {
     http.HandleFunc("/", home)
     http.HandleFunc("/users", getUsers)
-    println("Starting server on :8080")
+    println("Starting server successfully...")
 
     log.Println("Server started at :8080")
     log.Fatal(http.ListenAndServe(":8080", nil))
