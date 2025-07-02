@@ -7,15 +7,18 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Go Build') {
             steps {
                 sh 'go build -o userapi'
             }
         }
 
-        stage('Docker Build & Push') {
+        stage('Docker Build (Minikube local registry)') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                sh '''
+                eval $(minikube docker-env)
+                docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                '''
             }
         }
 
