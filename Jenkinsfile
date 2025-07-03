@@ -36,7 +36,7 @@ pipeline {
             steps {
                 sh '''
                 ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
-                  kubectl apply -f $DEPLOYMENT_YAML
+                  kubectl apply -f ${DEPLOYMENT_YAML}
                 '
                 '''
             }
