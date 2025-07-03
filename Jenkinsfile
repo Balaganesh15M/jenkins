@@ -37,6 +37,7 @@ pipeline {
         sh '''
         ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
             kubectl apply -f /home/balaganeshm/Desktop/jenkins/deployment.yaml
+            kubectl rollout restart deployment userapi
         '
         '''
     }
