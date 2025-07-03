@@ -24,16 +24,13 @@ pipeline {
             }
         }
         stage('Docker Build') {
-            steps {
-                sh '''
-                    # Set Docker to point to Minikube's Docker
-                    ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 '
-                      eval $(minikube docker-env) &&
-                      docker build -t userapi:latest /home/balaganeshm/Desktop/jenkins
-                    '
-                '''
-            }
-        }
+    steps {
+        sh '''
+        # Set Docker to point to Minikube's Docker
+        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 '
+          eval $(minikube docker-env) &&
+          docker build -t userapi:latest /home/balaganeshm/Desktop/jenkins
+        '
         '''
     }
 }
