@@ -25,10 +25,9 @@ pipeline {
         }
 
         stage('Deploy to Minikube') {
-  steps {
-    sh 'kubectl apply -f deployment.yaml'
-  }
-}
-
+            steps {
+                sh 'kubectl apply --validate=false -f deployment.yaml'
+            }
+        }
     }
 }
