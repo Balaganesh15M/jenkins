@@ -17,10 +17,12 @@ pipeline {
 
         stage('Deploy to Minikube') {
             steps {
-                sh '''
-                    ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 "kubectl apply -f /home/balaganeshm/Desktop/jenkins/deployment.yaml"
-                '''
-            }
-        }
+                 sh '''
+        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 kubectl apply -f /home/balaganeshm/Desktop/jenkins/deployment.yaml
+        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 kubectl rollout restart deployment userapi
+        '''
+    }
+}
+
     }
 }
