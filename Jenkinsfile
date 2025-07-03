@@ -1,9 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'golang:1.21'  // Official Go image
-        }
+    agent any
+
+    environment {
+        IMAGE_NAME = 'myuserapi:latest'
+        DEPLOYMENT_YAML = 'k8s/deployment.yaml'
     }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -13,10 +15,15 @@ pipeline {
 
         stage('Go Build') {
             steps {
-                sh '''
-                    go version
-                    go build -o userapi
-                '''
+                script {
+                    docker.image('golang:1.21').inside {
+                        sh '''
+                            go version
+                            go mod init example.com/myapp || true
+                            go build -o userapi
+                        '''
+                    }
+                }
             }
         }
 
@@ -33,3 +40,4 @@ pipeline {
         }
     }
 }
+
