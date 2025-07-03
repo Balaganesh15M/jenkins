@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'golang:1.21'
+        }
+    }
 
     environment {
         IMAGE_NAME = "userapi:latest"
@@ -8,11 +12,10 @@ pipeline {
 
     stages {
         stage('Checkout Code') {
-          steps {
-              git branch: 'main', url: 'https://github.com/Balaganesh15M/jenkins.git'
-    }   
-}
-
+            steps {
+                git branch: 'main', url: 'https://github.com/Balaganesh15M/jenkins.git'
+            }
+        }
 
         stage('Go Build') {
             steps {
@@ -25,17 +28,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh '''
-                    docker build -t $IMAGE_NAME .
-                '''
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Deploy to Minikube') {
             steps {
-                sh '''
-                    kubectl apply -f $DEPLOYMENT_YAML
-                '''
+                sh 'kubectl apply -f $DEPLOYMENT_YAML'
             }
         }
     }
