@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'golang:1.22'
-      args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME:/home/jenkins'
-    }
-  }
+  agent any
   environment {
     DEPLOYMENT_YAML = '/home/balaganeshm/Desktop/jenkins/deployment.yaml'
   }
@@ -16,15 +11,20 @@ pipeline {
     }
     stage('Go Build') {
       steps {
-        sh 'go version'
-        sh 'go build -o userapi'
+        sh '''
+          ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 '
+            cd /home/balaganeshm/Desktop/jenkins &&
+            go version &&
+            go build -o userapi
+          '
+        '''
       }
     }
     stage('Docker Build (in Minikube)') {
       steps {
         sh '''
           ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 "
-            eval \\$(minikube docker-env) &&
+            eval \$(minikube docker-env) &&
             docker build -t userapi:latest /home/balaganeshm/Desktop/jenkins
           "
         '''
