@@ -30,6 +30,8 @@ func main() {
     http.HandleFunc("/", home)
     http.HandleFunc("/users", getUsers)
     println("Starting server successfully...")
+    println("Starting server successfully...")
+
 
     log.Println("Server started at :8080")
     log.Fatal(http.ListenAndServe(":8080", nil))
