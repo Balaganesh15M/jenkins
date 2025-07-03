@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'golang:1.21'
-        }
-    }
+    agent any 
 
     environment {
         IMAGE_NAME = "userapi:latest"
