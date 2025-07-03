@@ -33,13 +33,14 @@ pipeline {
         }
 
         stage('Deploy to Minikube') {
-            steps {
-                sh '''
-                ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
-                  kubectl apply -f ${DEPLOYMENT_YAML}
-                '
-                '''
-            }
-        }
+    steps {
+        sh '''
+        ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
+            kubectl apply -f /home/balaganeshm/Desktop/jenkins/deployment.yaml
+        '
+        '''
+    }
+}
+
     }
 }
