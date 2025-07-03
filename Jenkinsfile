@@ -1,7 +1,19 @@
 pipeline {
     agent any
 
+    environment {
+        // Set path for Kubernetes YAML on host
+        DEPLOYMENT_YAML = "/home/balaganeshm/Desktop/jenkins/deployment.yaml"
+        MINIKUBE_HOST = "balaganeshm@172.17.0.1"
+    }
+
     stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Go Build') {
             steps {
                 sh 'go version'
@@ -9,32 +21,25 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Build (in Minikube)') {
             steps {
-                sh 'docker build -t userapi:latest .'
+                sh '''
+                ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
+                  eval $(minikube docker-env) &&
+                  docker build -t userapi:latest /home/balaganeshm/Desktop/jenkins
+                '
+                '''
             }
         }
 
         stage('Deploy to Minikube') {
             steps {
-                 sh '''
-        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 kubectl apply -f /home/balaganeshm/Desktop/jenkins/deployment.yaml
-        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 kubectl rollout restart deployment userapi
-        '''
+                sh '''
+                ssh -o StrictHostKeyChecking=no $MINIKUBE_HOST '
+                  kubectl apply -f $DEPLOYMENT_YAML
+                '
+                '''
             }
         }
-        stage('Docker Build') {
-    steps {
-        sh '''
-        # Set Docker to point to Minikube's Docker
-        ssh -o StrictHostKeyChecking=no balaganeshm@172.17.0.1 '
-          eval $(minikube docker-env) &&
-          docker build -t userapi:latest /home/balaganeshm/Desktop/jenkins
-        '
-        '''
-    }
-}
-
-
     }
 }
