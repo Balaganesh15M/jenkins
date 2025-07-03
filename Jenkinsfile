@@ -15,15 +15,11 @@ pipeline {
 
         stage('Go Build') {
             steps {
-                script {
-                    docker.image('golang:1.21').inside {
-                        sh '''
-                            go version
-                            go mod init example.com/myapp || true
-                            go build -o userapi
-                        '''
-                    }
-                }
+                sh '''
+                    go version
+                    go mod init example.com/myapp || true
+                    go build -o userapi
+                '''
             }
         }
 
