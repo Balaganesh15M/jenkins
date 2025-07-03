@@ -1,11 +1,9 @@
 pipeline {
-    agent any 
-
-    environment {
-        IMAGE_NAME = "userapi:latest"
-        DEPLOYMENT_YAML = "deployment.yaml"
+    agent {
+        docker {
+            image 'golang:1.21'  // Official Go image
+        }
     }
-
     stages {
         stage('Checkout Code') {
             steps {
