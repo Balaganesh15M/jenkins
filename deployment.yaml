@@ -15,7 +15,7 @@ spec:
       containers:
       - name: userapi
         image: userapi:latest
-        imagePullPolicy: Always  # <-- changed here
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 8080
 ---
