@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'myuserapi:latest'
         DEPLOYMENT_YAML = 'k8s/deployment.yaml'
+        PATH = "/usr/bin:$PATH"   // Explicitly add /usr/bin to PATH
     }
 
     stages {
@@ -16,6 +17,7 @@ pipeline {
         stage('Go Build') {
             steps {
                 sh '''
+                    echo "PATH=$PATH"
                     go version
                     go mod init example.com/myapp || true
                     go build -o userapi
@@ -36,4 +38,3 @@ pipeline {
         }
     }
 }
-
