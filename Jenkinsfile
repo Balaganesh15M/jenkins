@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'golang:1.20'
-        }
-    }
+    agent any
 
     environment {
         IMAGE_NAME = 'myuserapi:latest'
@@ -17,12 +13,23 @@ pipeline {
             }
         }
 
+        stage('Install Go') {
+            steps {
+                sh '''
+                    curl -LO https://golang.org/dl/go1.20.7.linux-amd64.tar.gz
+                    sudo rm -rf /usr/local/go
+                    sudo tar -C /usr/local -xzf go1.20.7.linux-amd64.tar.gz
+                    echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+                    export PATH=$PATH:/usr/local/go/bin
+                    go version
+                '''
+            }
+        }
+
         stage('Go Build') {
             steps {
                 sh '''
-                    echo "Checking Go version..."
-                    go version
-                    echo "Building Go app..."
+                    export PATH=$PATH:/usr/local/go/bin
                     go mod tidy
                     go build -o userapi
                 '''
