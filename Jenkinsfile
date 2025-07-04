@@ -3,7 +3,9 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'myuserapi:latest'
-        DEPLOYMENT_YAML = 'k8s/deployment.yaml'
+        DEPLOYMENT_YAML = 'deployment.yaml'
+        GOROOT = '/tmp/go/go'
+        PATH = '/tmp/go/go/bin:$PATH'
     }
 
     stages {
@@ -16,12 +18,12 @@ pipeline {
         stage('Install Go') {
             steps {
                 sh '''
+                    echo "Installing Go..."
                     curl -LO https://golang.org/dl/go1.20.7.linux-amd64.tar.gz
-                    sudo rm -rf /usr/local/go
-                    sudo tar -C /usr/local -xzf go1.20.7.linux-amd64.tar.gz
-                    echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
-                    export PATH=$PATH:/usr/local/go/bin
-                    go version
+                    rm -rf /tmp/go
+                    mkdir -p /tmp/go
+                    tar -C /tmp/go -xzf go1.20.7.linux-amd64.tar.gz
+                    /tmp/go/go/bin/go version
                 '''
             }
         }
@@ -29,7 +31,7 @@ pipeline {
         stage('Go Build') {
             steps {
                 sh '''
-                    export PATH=$PATH:/usr/local/go/bin
+                    export PATH=/tmp/go/go/bin:$PATH
                     go mod tidy
                     go build -o userapi
                 '''
