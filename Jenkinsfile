@@ -1,10 +1,13 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'golang:1.20'
+        }
+    }
 
     environment {
-        IMAGE_NAME = "userapi:latest"
-        DEPLOYMENT_YAML = "deployment.yaml"
-        PATH = "/usr/local/go/bin:$PATH"
+        IMAGE_NAME = 'myuserapi:latest'
+        DEPLOYMENT_YAML = 'k8s/deployment.yaml'
     }
 
     stages {
@@ -18,10 +21,9 @@ pipeline {
             steps {
                 sh '''
                     echo "Checking Go version..."
-                    go version || true
-                    
+                    go version
                     echo "Building Go app..."
-                    go mod tidy || true
+                    go mod tidy
                     go build -o userapi
                 '''
             }
@@ -29,22 +31,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh '''
-                    echo "Setting Docker env to Minikube..."
-                    eval $(minikube docker-env)
-
-                    echo "Building Docker image for Minikube..."
-                    docker build -t $IMAGE_NAME .
-                '''
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Deploy to Minikube') {
             steps {
-                sh '''
-                    echo "Applying deployment to Minikube..."
-                    kubectl apply -f $DEPLOYMENT_YAML
-                '''
+                sh 'kubectl apply -f $DEPLOYMENT_YAML'
             }
         }
     }
