@@ -2,51 +2,40 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'myuserapi:latest'
-        DEPLOYMENT_YAML = 'deployment.yaml'
-        GOROOT = '/tmp/go/go'
-        PATH = '/tmp/go/go/bin:$PATH'
+        dockerimagename = "balaganesh15m/userapi:latest"
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout Source') {
             steps {
-                git branch: 'main', url: 'https://github.com/Balaganesh15M/jenkins.git'
+                git 'https://github.com/Balaganesh15M/jenkins.git'
             }
         }
 
-        stage('Install Go') {
+        stage('Build Docker Image') {
             steps {
-                sh '''
-                    echo "Installing Go..."
-                    curl -LO https://golang.org/dl/go1.20.7.linux-amd64.tar.gz
-                    rm -rf /tmp/go
-                    mkdir -p /tmp/go
-                    tar -C /tmp/go -xzf go1.20.7.linux-amd64.tar.gz
-                    /tmp/go/go/bin/go version
-                '''
+                script {
+                    dockerImage = docker.build(dockerimagename)
+                }
             }
         }
 
-        stage('Go Build') {
-            steps {
-                sh '''
-                    export PATH=/tmp/go/go/bin:$PATH
-                    go mod tidy
-                    go build -o userapi
-                '''
+        stage('Push Docker Image') {
+            environment {
+                registryCredentials = 'dockerhub'
             }
-        }
-
-        stage('Docker Build') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', registryCredentials) {
+                        dockerImage.push('latest')
+                    }
+                }
             }
         }
 
         stage('Deploy to Minikube') {
             steps {
-                sh 'kubectl apply -f $DEPLOYMENT_YAML'
+                sh 'kubectl apply -f deployment.yaml'
             }
         }
     }
